@@ -1,14 +1,15 @@
 import React from 'react';
-import ArchiveBtn from './ArchivedBtn';
+import BodyNotes from './BodyNotes';
 import DeleteBtn from './DeleteBtn';
-import ItemBody from './ItemBody';
+import ArchiveBtn from './ArchiveBtn';
 
-function ItemNotes({title, id, body, onDelete, onArchived, isArchived}) {
-    return (
+function ItemNotes({title, body, id, onDelete, onArchived, isArchived}){
+    return(
         <div className='note-item'>
-            <ItemBody title={title} body={body}/>
+            <BodyNotes title={title} body={body}/>
             <DeleteBtn id={id} onDelete={onDelete}/>
             <ArchiveBtn id={id} onArchived={onArchived} isArchived={isArchived}/>
+     
         </div>
     );
 }

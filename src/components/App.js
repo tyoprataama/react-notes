@@ -1,81 +1,94 @@
 import React from 'react';
-import ListNotes from './List';
-import { getInitialData, showFormattedDate } from '../utils/data';
-import Input from './Input';
-import EmptyNotes from './EmptyNotes';
-import Header from './Header';
+import ListNotes from './ListNotes';
+import { getInitialData, showFormattedDate } from'../utils/index';
+import InputNotes from './InputNotes';
+import EmptyMsg from './EmptyMsg';
+import SearchBar from './SearchBar';
 
-class PersonalNotes extends React.Component{
+
+class App extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            notes: getInitialData(),
-            search: '',
-            date: showFormattedDate(new Date()),
-        }   
-        this.onAddNoteHandler = this.onAddNoteHandler.bind(this);
-        this.onArchivedHandler = this.onArchivedHandler.bind(this);
+            notes:getInitialData(),
+            search:'',
+            date:showFormattedDate(new Date()),
+        }
+
+        this.onSearchBarHandler = this.onSearchBarHandler.bind(this);
         this.onDeleteHandler = this.onDeleteHandler.bind(this);
-        this.onSearchHandler = this.onSearchHandler.bind(this);
+        this.onArchivedEventHandler = this.onArchivedEventHandler.bind(this);
+        this.onAddNotesHandler = this.onAddNotesHandler.bind(this);
     }
 
-    onSearchHandler(event) {
-        this.setState(() => {
-            return{
-                search: event.target.value
-            }
-        })
-    }
-
-    onDeleteHandler(id) {
-        const notes = this.state.notes.filter(note => note.id !== id);
-        this.setState({notes});
-    }
-
-    onArchivedHandler(id) {
-        const notes = this.state.notes.map((note) => 
-            note.id === id ? {...note, archived: !note.archived} : note)
+    onDeleteHandler(id){
+        const notes = this.state.notes.filter(note=> 
+            note.id !== id);
             this.setState({notes});
     }
 
-     onAddNoteHandler({title, body}) {
-        this.setState((prevState) => {
+    onArchivedEventHandler(id){
+        const notes = this.state.notes.map((note)=>
+        note.id === id ? {...note, archived : !note.archived } : note)
+        this.setState({notes});
+    }
+
+    onAddNotesHandler({title, body}){
+        this.setState((prevState) =>{
             return{
-                notes: [
+                notes:[
                     ...prevState.notes,
                     {
-                        id: +new Date(),
-                        title,
+                        id:+new Date(),
+                        title, 
                         body,
                         archived: false,
                         createdAt: this.state.date,
                     }
-                ]
+                ],
             }
         })
     }
 
-    render() {
+    onSearchBarHandler(event) {
+        this.setState(() => {
+          return {
+            search : event.target.value
+          }
+        })
+      }
+    
+    render(){
+    
         const notes = this.state.notes.filter((note) => note.title.toLowerCase().includes(this.state.search.toLowerCase()))
-        const ActiveNotes = notes.filter((note) => {
-            return note.archived === true
-        });
-        const InactiveNotes = notes.filter((note) => {
+        const NotesNonActive = notes.filter((note)=>{
             return note.archived === false
         });
-        return (
+        const NotesActive = notes.filter((note)=>{
+            return note.archived === true
+        }); 
+
+        return(
+           
             <div>
-                <Header search={this.state.search} onSurf={this.onSearchHandler} />
-                <div className='note-app__body'>
-                    <Input addNotes={this.onAddNoteHandler}/>
+                <SearchBar search={this.state.search} onSearch={this.onSearchBarHandler} />
+    
+                <div className="note-app__body">
+                    <InputNotes addNotes = {this.onAddNotesHandler}/>
                     <h2>Catatan Aktif</h2>
-                    {InactiveNotes.length > 0 ? <ListNotes keyword={this.state.keyword} notes={InactiveNotes} onDelete={this.onDeleteHandler} onArchived={this.onArchivedHandler}/> : <EmptyNotes/>}
-                    <h2>Archive</h2>
-                    {ActiveNotes.length > 0 ? <ListNotes keyword={this.state.keyword} notes={ActiveNotes} onDelete={this.onDeleteHandler} onArchived={this.onArchivedHandler}/> : <EmptyNotes/>}
+                    {NotesNonActive.length > 0 ? <ListNotes keyword={this.state.keyword} notes={NotesNonActive} onDelete={this.onDeleteHandler} onArchived={this.onArchivedEventHandler} /> : <EmptyMsg />}
+                
+                     <h2>Arsip</h2>
+                    {NotesActive.length > 0 ? <ListNotes keyword={this.state.keyword} notes={NotesActive} onDelete={this.onDeleteHandler} onArchived={this.onArchivedEventHandler} />
+                    : <EmptyMsg />}
+                    
                 </div>
+                
+
             </div>
         );
     }
 }
 
-export default PersonalNotes;
+
+export default App;
